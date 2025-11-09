@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Django ChatBot</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f7f7; }
+        #chatbox { width: 600px; margin: 40px auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+        #chatlogs { height: 500px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
+        .user { text-align: right; color: rgb(23, 23, 24); margin: 10px 0; }
+        .bot { text-align: left; color: rgb(20, 22, 20); margin: 10px 0; }
+        input[type="text"] { width: 100%; padding: 10px; box-sizing: border-box; border-radius: 20px; }
+        button { width: 100%; padding: 10px; background: teal; color: rgba(255, 255, 255, 0.929); border: none; cursor: pointer; margin-top: 5px;}
+    </style>
+</head>
+<body>
+    <div id="chatbox">
+        <div id="chatlogs"></div>
+        <input type="text" id="userInput" placeholder="Type your message..." autocomplete="off" />
+       
+    </div>
+
+    <script>
+        function sendMessage() {
+            let input = document.getElementById('userInput');
+            let msg = input.value.trim();
+            if (!msg) return;
+
+            let chatlogs = document.getElementById('chatlogs');
+            chatlogs.innerHTML += `<div class="user">${msg}</div>`;
+
+            fetch(`/chat/get-response/?msg=${encodeURIComponent(msg)}`)
+                .then(res => res.json())
+                .then(data => {
+                    chatlogs.innerHTML += `<div class="bot">${data.response}</div>`;
+                    chatlogs.scrollTop = chatlogs.scrollHeight;
+                });
+
+            input.value = '';
+            input.focus();
+        }
+
+        // Make Enter key work
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if(e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
